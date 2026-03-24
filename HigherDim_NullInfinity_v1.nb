@@ -1,0 +1,1226 @@
+(* Content-type: application/vnd.wolfram.mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(*CacheID: 234*)
+(* Internal cache information:
+NotebookFileLineBreakTest
+NotebookFileLineBreakTest *)
+
+Notebook[{
+
+Cell[CellGroupData[{
+
+Cell["Higher Dimensional Asymptotically Flat Spacetime \[LongDash] Future Null \
+Infinity Analysis (v1)", "Title"],
+
+Cell["Anandh Krishna M \[LongDash] Masters Thesis Work", "Subtitle"],
+
+Cell["\<\
+This notebook implements the analysis of higher dimensional (D \[GreaterEqual] \
+4) asymptotically flat spacetimes using the xAct framework for Mathematica. \
+The code follows the Bondi-Sachs formalism adapted to D spacetime dimensions, \
+studying the structure of future null infinity (\[ScriptCapitalI]\[PlusMinus]) \
+and the associated asymptotic symmetry algebra (generalised BMS group).\
+\>", "Text"],
+
+Cell[CellGroupData[{
+
+Cell["1. Prerequisites and Package Loading", "Section"],
+
+Cell["\<\
+Requires the xAct suite:  xTensor, xCoba, xPert, and (optionally) Invar.
+Install via https://www.xact.es/  or  the Mathematica Package Manager.\
+\>", "Text"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", " ",
+   RowBox[{
+    RowBox[{"Load", " ", "xAct", " ", "packages"}], ";",
+    RowBox[{
+     RowBox[{
+      RowBox[{"adjust", " ", "the", " ", "path", " ", "if", " ", "xAct", " ",
+       "is", " ", "not", " ", "on", " ", "the", " ", "default", " ", "Mathematica"}], " ",
+      RowBox[{"package", " ", "search", " ", "path"}]}]}]}], " ", "*)"}],
+  "\[IndentingNewLine]",
+  RowBox[{
+   RowBox[{"Needs", "[", "\"\<xAct`xTensor`\>\"", "]"}], ";", "\n",
+   RowBox[{"Needs", "[", "\"\<xAct`xCoba`\>\"", "]"}], ";", "\n",
+   RowBox[{"Needs", "[", "\"\<xAct`xPert`\>\"", "]"}], ";"}]}]], "Input"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", " ",
+   RowBox[{
+    "Set", " ", "the", " ", "number", " ", "of", " ", "spacetime", " ",
+    "dimensions"}], " ", "*)"}], "\[IndentingNewLine]",
+  RowBox[{
+   RowBox[{"D", " ", "=", " ", "5"}], ";",
+   RowBox[{"(*", " ",
+    RowBox[{
+     "Change", " ", "to", " ", "any", " ", "integer", " ",
+     RowBox[{"\[GreaterEqual]", " ", "4"}]}], " ", "*)"}]}]}]], "Input"],
+
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["2. Manifold, Bundle and Index Definitions", "Section"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", " ",
+   RowBox[{
+    "Define", " ", "the", " ", "D", "\[Hyphen]dimensional", " ",
+    "spacetime", " ", "manifold"}], " ", "*)"}], "\[IndentingNewLine]",
+  RowBox[{
+   RowBox[{"DefManifold", "[",
+    RowBox[{"M", ",", "D", ",",
+     RowBox[{"{",
+      RowBox[{
+       RowBox[{"\[Mu]", ",", "\[Nu]", ",", "\[Rho]", ",", "\[Sigma]", ",",
+        "\[Kappa]", ",", "\[Lambda]"}], ",",
+       RowBox[{"\[Alpha]", ",", "\[Beta]", ",", "\[Gamma]", ",",
+        "\[Delta]"}]}], "}"}]}], "]"}], ";"}]}]], "Input"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", " ",
+   RowBox[{
+    "Define", " ", "the", " ", "Lorentzian", " ", "metric", " ", "on", " ",
+    "M"}], " ", "*)"}], "\[IndentingNewLine]",
+  RowBox[{
+   RowBox[{"DefMetric", "[",
+    RowBox[{
+     RowBox[{"-", "1"}], ",",
+     RowBox[{"gMetric", "[",
+      RowBox[{"-", "\[Mu]"}], ",",
+      RowBox[{"-", "\[Nu]"}], "]"}], ",",
+     "CD", ",",
+     RowBox[{"{",
+      RowBox[{"\"\<g\>\"", ",", "\"\<\[Del]\>\""}], "}"}]}], "]"}], ";"}]}]], \
+"Input"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", " ",
+   RowBox[{
+    "Define", " ", "the", " ",
+    RowBox[{"(", "D-2", ")"},
+    "\[Hyphen]dimensional", " ", "sphere", " ", "manifold", " ", "for",
+    " ", "the", " ", "angular", " ", "sector"}], " ", "*)"}],
+  "\[IndentingNewLine]",
+  RowBox[{
+   RowBox[{"DefManifold", "[",
+    RowBox[{"S", ",",
+     RowBox[{"D", "-", "2"}], ",",
+     RowBox[{"{",
+      RowBox[{"A", ",", "B", ",", "C", ",", "E", ",", "F", ",", "G"}], "}"}]}],
+    "]"}], ";"}]}]], "Input"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", " ",
+   RowBox[{
+    "Round", " ", "metric", " ", "on", " ", "the", " ", "unit", " ",
+    RowBox[{"(", "D-2", ")"},
+    "\[Hyphen]sphere"}], " ", "*)"}], "\[IndentingNewLine]",
+  RowBox[{
+   RowBox[{"DefMetric", "[",
+    RowBox[{"1", ",",
+     RowBox[{"Omega", "[",
+      RowBox[{"-", "A"}], ",",
+      RowBox[{"-", "B"}], "]"}], ",",
+     "CDS", ",",
+     RowBox[{"{",
+      RowBox[{"\"\<\[CapitalOmega]\>\"", ",", "\"\<\[Del]S\>\""}], "}"}]}],
+    "]"}], ";"}]}]], "Input"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", " ",
+   RowBox[{
+    "Abstract", " ", "tensors", " ", "representing", " ", "asymptotic",
+    " ", "data"}], " ", "*)"}], "\[IndentingNewLine]",
+  RowBox[{
+   RowBox[{"(*", " ",
+    RowBox[{
+     "h", "[", "-A", ",", "-B", "]"}], " ",
+    RowBox[{
+     "=", " ", "leading", " ", "traceless", " ", "transverse", " ",
+     "shear", " ", "tensor"}], " ", "*)"}], "\[IndentingNewLine]",
+  RowBox[{"DefTensor", "[",
+    RowBox[{
+     RowBox[{"h", "[",
+      RowBox[{"-", "A"}], ",",
+      RowBox[{"-", "B"}], "]"}], ",", "S",",",
+     RowBox[{"Symmetric", "[",
+      RowBox[{"{",
+       RowBox[{"1", ",", "2"}], "}"}], "]"}]}], "]"}], ";",
+   "\[IndentingNewLine]",
+   RowBox[{"(*", " ",
+    RowBox[{"News", " ", "tensor"}], " ", "*)"}],
+   "\[IndentingNewLine]",
+   RowBox[{"DefTensor", "[",
+    RowBox[{
+     RowBox[{"NAB", "[",
+      RowBox[{"-", "A"}], ",",
+      RowBox[{"-", "B"}], "]"}], ",",
+     RowBox[{"{",
+      RowBox[{"S", ",", "M"}], "}"}], ",",
+     RowBox[{"Symmetric", "[",
+      RowBox[{"{",
+       RowBox[{"1", ",", "2"}], "}"}], "]"}]}], "]"}], ";",
+   "\[IndentingNewLine]",
+   RowBox[{"(*", " ",
+    RowBox[{"Bondi", " ", "mass", " ", "aspect"}], " ", "*)"}],
+   "\[IndentingNewLine]",
+   RowBox[{"DefTensor", "[",
+    RowBox[{
+     RowBox[{"MBondi", "[","]"}], ",",
+     RowBox[{"{",
+      RowBox[{"S", ",", "M"}], "}"}]}], "]"}], ";",
+   "\[IndentingNewLine]",
+   RowBox[{"(*", " ",
+    RowBox[{
+     "Angular", " ", "momentum", " ", "aspect"}], " ", "*)"}],
+   "\[IndentingNewLine]",
+   RowBox[{"DefTensor", "[",
+    RowBox[{
+     RowBox[{"NA", "[",
+      RowBox[{"-", "A"}], "]"}], ",",
+     RowBox[{"{",
+      RowBox[{"S", ",", "M"}], "}"}]}], "]"}], ";"}]}]], "Input"],
+
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["3. Bondi-Sachs Metric in D Dimensions", "Section"],
+
+Cell["\<\
+The D-dimensional Bondi-Sachs metric in retarded Bondi coordinates \
+(u, r, x^A) reads:
+
+  ds\[ThinSpace]\[Squared] = \[Minus](e^{2\[Beta]} V/r \[Minus] r\[ThinSpace]\
+\[Squared] h_{AB} U^A U^B) du\[ThinSpace]\[Squared]
+              \[Minus] 2 e^{2\[Beta]} du dr
+              \[Minus] 2 r\[ThinSpace]\[Squared] h_{AB} U^B du dx^A
+              + r\[ThinSpace]\[Squared] h_{AB} dx^A dx^B
+
+where \[Beta], V, U^A and h_{AB} depend on (u, r, x^A).  The determinant \
+condition fixes det(h_{AB}) = det(\[CapitalOmega]_{AB}).\
+\>", "Text"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", " ",
+   RowBox[{
+    "Asymptotic", " ", "expansions", " ", "of", " ", "the", " ", "Bondi",
+    "\[Hyphen]Sachs", " ", "metric", " ", "functions", " ", "in", " ",
+    "powers", " ", "of", " ", "1", "/", "r"}], " ", "*)"}],
+  "\[IndentingNewLine]",
+  RowBox[{"(*", " ",
+   RowBox[{
+    RowBox[{"\[Beta]", " ", "falls", " ", "off", " ", "as", " ", "\[Beta]", "~",
+     FractionBox[
+      RowBox[{"\[Beta]", "(", "n", ")"}], SuperscriptBox["r","n"]]}], ",",
+    " ",
+    RowBox[{
+     RowBox[{"leading", " ", "term", " ", "at", " ",
+      SuperscriptBox["r", RowBox[{"-",
+       RowBox[{"(", "D-2", ")"}]}]]}],
+     " ",
+     RowBox[{"(", "D", "\[GreaterEqual]", "4", ")"}]}]}], " ", "*)"}],
+  "\[IndentingNewLine]",
+  RowBox[{
+   RowBox[{"DefTensor", "[",
+    RowBox[{
+     RowBox[{"\[Beta]coeff", "[","]"}], ",",
+     RowBox[{"{",
+      RowBox[{"S", ",", "M"}], "}"}]}], "]"}], ";",
+   "\[IndentingNewLine]",
+   RowBox[{"(*", " ",
+    RowBox[{
+     "V", " ", "function", " ", ":",
+     " ", "expansion", " ", "starts", " ", "at", " ", "order", " ",
+     SuperscriptBox["r",RowBox[{"D","-","3"}]]}], " ", "*)"}],
+   "\[IndentingNewLine]",
+   RowBox[{"DefTensor", "[",
+    RowBox[{
+     RowBox[{"Vcoeff", "[","]"}], ",",
+     RowBox[{"{",
+      RowBox[{"S", ",", "M"}], "}"}]}], "]"}], ";",
+   "\[IndentingNewLine]",
+   RowBox[{"(*", " ",
+    RowBox[{
+     "Shift", " ", "vector", " ", "U^A", " ", ":",
+     " ", "expansion", " ", "starts", " ", "at", " ", "order", " ",
+     SuperscriptBox["r", RowBox[{"-","1"}]]}], " ", "*)"}],
+   "\[IndentingNewLine]",
+   RowBox[{"DefTensor", "[",
+    RowBox[{
+     RowBox[{"Ucoeff", "[",
+      RowBox[{"+", "A"}], "]"}], ",",
+     RowBox[{"{",
+      RowBox[{"S", ",", "M"}], "}"}]}], "]"}], ";"}]}]], "Input"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", " ",
+   RowBox[{
+    "Explicit", " ", "component", " ", "metric", " ", "for", " ",
+    "coordinate", "\[Hyphen]based", " ", "computations"}], " ", "*)"}],
+  "\[IndentingNewLine]",
+  RowBox[{"(*", " ",
+   RowBox[{
+    "Define", " ", "a", " ", "coordinate", " ", "chart", " ", "on", " ", "M",
+    " ", "with", " ", "Bondi", " ", "coordinates", " ", ":",
+    " ", "\[LeftBrace]u", ",", "r", ",",
+    RowBox[{"x1", ",", "...", ","}],
+    RowBox[{"x", RowBox[{"(", "D-2", ")"}], "\[RightBrace]"}]}], " ", "*)"}],
+  "\[IndentingNewLine]",
+  RowBox[{
+   RowBox[{"DefChart", "[",
+    RowBox[{"bondi", ",", "M", ",",
+     RowBox[{"{",
+      RowBox[{"0", ",", "1", ",",
+       RowBox[{"Sequence", "@@",
+        RowBox[{"Range", "[",
+         RowBox[{"2", ",", "D-1"}], "]"}]}]}], "}"}], ",",
+     RowBox[{"Symbol", "/@",
+      RowBox[{"Join", "[",
+       RowBox[{
+        RowBox[{"{",
+         RowBox[{"\"\<u\>\"", ",", "\"\<r\>\""}], "}"}], ",",
+        RowBox[{"Table", "[",
+         RowBox[{
+          RowBox[{"\"\<x\>\"", "<>",
+           RowBox[{"ToString", "[", "i", "]"}]}], ",",
+          RowBox[{"{",
+           RowBox[{"i", ",", "1", ",", "D-2"}], "}"}]}], "]"}]}], "]"}]}]}],
+    "]"}], ";"}]}]], "Input"],
+
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["4. Asymptotic Expansion Coefficients and Falloff Conditions", "Section"],
+
+Cell["\<\
+In D spacetime dimensions the standard falloff conditions are:
+
+  h_{AB} = \[CapitalOmega]_{AB} + C_{AB}/r + D_{AB}/r^2 + ...
+  \[Beta]   = \[Beta]^{(D-2)} / r^{D-2} + ...
+  U^A       = U^{A,(D-3)} / r^{D-3} + ...
+  V/r       = \[Minus](D-3) + 2M(u,x^A) / r^{D-3} + ...
+
+For D = 4 the leading shear C_{AB} falls off as 1/r, whereas for D > 4 it
+falls off faster.  The news tensor is N_{AB} = \[PartialD]_u C_{AB}.\
+\>", "Text"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", " ",
+   RowBox[{
+    "Define", " ", "abstract", " ", "expansion", " ", "tensors"}], " ", "*)"}],
+  "\[IndentingNewLine]",
+  RowBox[{
+   RowBox[{"(*", " ",
+    RowBox[{"Subleading", " ", "metric", " ", "perturbations"}], " ", "*)"}],
+   "\[IndentingNewLine]",
+   RowBox[{"DefTensor", "[",
+    RowBox[{
+     RowBox[{"CAB", "[",
+      RowBox[{"-", "A"}], ",",
+      RowBox[{"-", "B"}], "]"}], ",",
+     RowBox[{"{",
+      RowBox[{"S", ",", "M"}], "}"}], ",",
+     RowBox[{"Symmetric", "[",
+      RowBox[{"{",
+       RowBox[{"1", ",", "2"}], "}"}], "]"}]}], "]"}], ";",
+   "\[IndentingNewLine]",
+   RowBox[{"DefTensor", "[",
+    RowBox[{
+     RowBox[{"DAB", "[",
+      RowBox[{"-", "A"}], ",",
+      RowBox[{"-", "B"}], "]"}], ",",
+     RowBox[{"{",
+      RowBox[{"S", ",", "M"}], "}"}], ",",
+     RowBox[{"Symmetric", "[",
+      RowBox[{"{",
+       RowBox[{"1", ",", "2"}], "}"}], "]"}]}], "]"}], ";",
+   "\[IndentingNewLine]",
+   RowBox[{"(*", " ",
+    RowBox[{
+     "Determinant", " ", "constraint", " ", ":",
+     " ", "CAB", " ", "is", " ", "traceless", " ",
+     "w.r.t.", " ", "\[CapitalOmega]"}], " ", "*)"}],
+   "\[IndentingNewLine]",
+   RowBox[{"DefTensor", "[",
+    RowBox[{
+     RowBox[{"trC", "[","]"}], ",",
+     RowBox[{"{",
+      RowBox[{"S", ",", "M"}], "}"}]}], "]"}], ";"}]}]], "Input"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", " ",
+   RowBox[{
+    "Tracelessness", " ", "and", " ", "Bondi", " ", "condition"}], " ", "*)"}],
+  "\[IndentingNewLine]",
+  RowBox[{
+   RowBox[{"trC", "[]"}], " ", "=", " ",
+   RowBox[{"Omega", "[",
+    RowBox[{"A", ",", "B"}], "]"}],
+   RowBox[{"CAB", "[",
+    RowBox[{"-", "A"}], ",",
+    RowBox[{"-", "B"}], "]"}]}]}]], "Input"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", " ",
+   RowBox[{
+    "News", " ", "tensor", " ", ":",
+    " ", RowBox[{
+     RowBox[{"N_{AB}", " ", "=", " "}],
+     RowBox[{"\[PartialD]_u", " ", "C_{AB}"}]}]}], " ", "*)"}],
+  "\[IndentingNewLine]",
+  RowBox[{
+   RowBox[{"newsRule", " ", "=", " ",
+    RowBox[{"NAB", "[",
+     RowBox[{"-", "A"}], ",",
+     RowBox[{"-", "B"}], "]"}]}], " ", "\[Rule]", " ",
+   RowBox[{"Dt", "[",
+    RowBox[{
+     RowBox[{"CAB", "[",
+      RowBox[{"-", "A"}], ",",
+      RowBox[{"-", "B"}], "]"}], ",",
+     "u"}], "]"}]}]}]], "Input"],
+
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["5. Curvature Computation via xAct (xTensor)", "Section"],
+
+Cell["\<\
+We use xTensor to compute the Riemann, Ricci and Einstein tensors symbolically \
+in a completely general D-dimensional Lorentzian manifold, then specialise to \
+the Bondi gauge.\
+\>", "Text"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", " ",
+   RowBox[{
+    "The", " ", "covariant", " ", "derivative", " ", "CD", " ", "was",
+    " ", "defined", " ", "with", " ", "DefMetric", " ", "above"}], " ", "*)"}],
+  "\[IndentingNewLine]",
+  RowBox[{
+   RowBox[{"(*", " ",
+    RowBox[{"Riemann", " ", "tensor"}], " ", "*)"}], "\[IndentingNewLine]",
+   RowBox[{"RiemannCD", " ", "=", " ",
+    RowBox[{"Riemann", "[",
+     RowBox[{
+      RowBox[{"-", "\[Mu]"}], ",",
+      RowBox[{"-", "\[Nu]"}], ",",
+      RowBox[{"-", "\[Rho]"}], ",",
+      RowBox[{"-", "\[Sigma]"}]}], "]"}]}], ";",
+   "\[IndentingNewLine]",
+   RowBox[{"(*", " ",
+    RowBox[{"Ricci", " ", "tensor"}], " ", "*)"}],
+   "\[IndentingNewLine]",
+   RowBox[{"RicciCD", " ", "=", " ",
+    RowBox[{"Ricci", "[",
+     RowBox[{
+      RowBox[{"-", "\[Mu]"}], ",",
+      RowBox[{"-", "\[Nu]"}]}], "]"}]}], ";",
+   "\[IndentingNewLine]",
+   RowBox[{"(*", " ",
+    RowBox[{"Ricci", " ", "scalar"}], " ", "*)"}],
+   "\[IndentingNewLine]",
+   RowBox[{"RicciScalar", " ", "=", " ",
+    RowBox[{"RicciScalar", "[","]"}]}], ";",
+   "\[IndentingNewLine]",
+   RowBox[{"(*", " ",
+    RowBox[{"Einstein", " ", "tensor"}], " ", "*)"}],
+   "\[IndentingNewLine]",
+   RowBox[{"EinsteinCD", " ", "=", " ",
+    RowBox[{"Einstein", "[",
+     RowBox[{
+      RowBox[{"-", "\[Mu]"}], ",",
+      RowBox[{"-", "\[Nu]"}]}], "]"}]}], ";"}]}]], "Input"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", " ",
+   RowBox[{
+    "Bianchi", " ", "identity", " ", "\[EmptySet]",
+    " ", RowBox[{"(", "automatically", " ", "satisfied", " ", "by",
+     " ", "xTensor", ")"}]}], " ", "*)"}], "\[IndentingNewLine]",
+  RowBox[{
+   RowBox[{"bianchi", " ", "=", " ",
+    RowBox[{"ContractMetric", "[",
+     RowBox[{
+      RowBox[{"CD", "[",
+       RowBox[{"\[Mu]", ",",
+        RowBox[{"Einstein", "[",
+         RowBox[{
+          RowBox[{"-", "\[Mu]"}], ",",
+          RowBox[{"-", "\[Nu]"}]}], "]"}]}], "]"}]}], "]"}]}], ";",
+   "\[IndentingNewLine]",
+   RowBox[{"ToCanonical", "[",
+    RowBox[{"bianchi", "//", "ContractMetric"}], "]"}]}]}]], "Input"],
+
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["6. Einstein Equations in Bondi Gauge", "Section"],
+
+Cell["\<\
+In the Bondi gauge, with the determinant condition on h_{AB}, the vacuum \
+Einstein equations G_{\[Mu]\[Nu]} = 0 decompose into:
+
+  (i)  Hypersurface equations  (main equations)  \[LongDash] determine \[Beta], V, U^A
+  (ii) Evolution equations           \[LongDash] determine \[PartialD]_u h_{AB}
+  (iii) Supplementary conditions    \[LongDash] Bondi mass-loss and angular
+                                       momentum-loss formulae
+
+Below we extract these equations order by order in 1/r.\
+\>", "Text"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", " ",
+   RowBox[{
+    "Order", " ", "1", "/",
+    RowBox[{
+     RowBox[{"r", "^", RowBox[{"(", "D-3", ")"}]}, ":",
+     " ", "Bondi", " ", "mass", "\[Hyphen]loss"}]}]}], " ", "*)"}],
+  "\[IndentingNewLine]",
+  RowBox[{"(*", " ",
+   RowBox[{
+    RowBox[{"\[PartialD]_u", " ", "M"}], " ", "=",
+    " ",
+    RowBox[{
+     RowBox[{
+      FractionBox["-1", RowBox[{"2", "(", "D-2", ")"}]],
+      RowBox[{"N_{AB}", " ", "N^{AB}"}]}], " ",
+     "+", " ",
+     RowBox[{"boundary", " ", "terms"}]}]}], " ", "*)"}],
+  "\[IndentingNewLine]",
+  RowBox[{
+   RowBox[{"massLossLHS", " ", "=", " ",
+    RowBox[{"Dt", "[",
+     RowBox[{
+      RowBox[{"MBondi", "[","]"}], ",", "u"}], "]"}]}], ";",
+   "\[IndentingNewLine]",
+   RowBox[{"massLossRHS", " ", "=", " ",
+    RowBox[{
+     FractionBox["-1",
+      RowBox[{"2", " ", "(", "D-2", ")"}]],
+     RowBox[{"Omega", "[",
+      RowBox[{"A", ",", "C"}], "]"}],
+     RowBox[{"Omega", "[",
+      RowBox[{"B", ",", "E"}], "]"}],
+     RowBox[{"NAB", "[",
+      RowBox[{"-", "A"}], ",",
+      RowBox[{"-", "B"}], "]"}],
+     RowBox[{"NAB", "[",
+      RowBox[{"-", "C"}], ",",
+      RowBox[{"-", "E"}], "]"}]}]}], ";",
+   "\[IndentingNewLine]",
+   RowBox[{"massLossEqn", " ", "=", " ",
+    RowBox[{"massLossLHS", " ", "\[Equal]", " ", "massLossRHS"}]}]}]}]], \
+"Input"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", " ",
+   RowBox[{
+    "Angular", " ", "momentum", " ", "loss", " ", "equation"}], " ", "*)"}],
+  "\[IndentingNewLine]",
+  RowBox[{"(*", " ",
+   RowBox[{
+    RowBox[{"\[PartialD]_u", " ", "N_A"}], " ", "=", " ",
+    RowBox[{
+     RowBox[{"-",
+      FractionBox["1","D-3"],
+      " ",
+      RowBox[{
+       RowBox[{"\[Del]^B", " ", "N_{AB}"}], " ",
+       RowBox[{"(", "news", " ", "contribution", ")"}]}]}], " ",
+     "+", " ", "..."}]}], " ", "*)"}], "\[IndentingNewLine]",
+  RowBox[{
+   RowBox[{"angMomLossLHS", " ", "=", " ",
+    RowBox[{"Dt", "[",
+     RowBox[{
+      RowBox[{"NA", "[",
+       RowBox[{"-", "A"}], "]"}], ",", "u"}], "]"}]}], ";"}]}]], "Input"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", " ",
+   RowBox[{
+    "Constraint", " ", "from", " ", "the", " ", "G_{uu}", " ", "component"}], " ", "*)"}],
+  "\[IndentingNewLine]",
+  RowBox[{
+   RowBox[{"GuuruleCheck", " ", "=", " ",
+    RowBox[{"Simplify", "[",
+     RowBox[{
+      RowBox[{"ContractMetric", "[",
+       RowBox[{"EinsteinCD", " ", "/.",
+        RowBox[{"\[Mu]", "\[Rule]", "0"}], " ", "/.",
+        RowBox[{"\[Nu]", "\[Rule]", "0"}]}], "]"}], " ", "\[Equal]", " ", "0"}], "]"}]}], ";"}]}]], "Input"],
+
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["7. Asymptotic Symmetry Algebra (Generalised BMS)", "Section"],
+
+Cell["\<\
+The asymptotic symmetry group of D-dimensional asymptotically flat spacetime \
+preserving the Bondi gauge and the falloff conditions is:
+
+  D = 4 : BMS_4 = Supertranslations \[RightTriangle]\[LeftTriangle] Superrotations (Lorentz or Virasoro)
+  D > 4 : BMS_D = Supertranslations \[RightTriangle]\[LeftTriangle] SO(D-1,1)  (only finite-dimensional)
+
+The supertranslation generator is parametrised by a function f(x^A) on S^{D-2}
+with the action:  u \[Rule] u + f(x^A),   r \[Rule] r,   x^A \[Rule] x^A.\
+\>", "Text"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", " ",
+   RowBox[{
+    "Supertranslation", " ", "Killing", " ", "vector", " ", "on", " ",
+    "future", " ", "null", " ", "infinity"}], " ", "*)"}],
+  "\[IndentingNewLine]",
+  RowBox[{
+   RowBox[{"DefTensor", "[",
+    RowBox[{
+     RowBox[{"fST", "[","]"}], ",", "S"}], "]"}], ";",
+   "\[IndentingNewLine]",
+   RowBox[{"(*", " ",
+    RowBox[{
+     "Supertranslation", " ", "vector", " ", "field", " ", "\[Xi]^u",
+     " ", "=", " ", "f", ",",
+     " ", "\[Xi]^r", " ", "=", " ", "0", ",",
+     " ", "\[Xi]^A", " ", "=", " ", "0"}], " ", "*)"}],
+   "\[IndentingNewLine]",
+   RowBox[{"DefTensor", "[",
+    RowBox[{
+     RowBox[{"\[Xi]ST", "[",
+      RowBox[{"\[Mu]"}], "]"}], ",", "M"}], "]"}], ";",
+   "\[IndentingNewLine]",
+   RowBox[{"\[Xi]STcomponents", " ", "=", " ",
+    RowBox[{"{",
+     RowBox[{
+      RowBox[{"\[Xi]ST", "[",
+       RowBox[{"0"}], "]"}], " ", "\[Rule]", " ",
+      RowBox[{"fST", "[]"}]}], "}"}]}]}]}]], "Input"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", " ",
+   RowBox[{
+    "For", " ", "D", "=", "4", " ", ":",
+    " ", "superrotation", " ", "vector", " ", "Y^A", " ", "=", " ",
+    RowBox[{
+     RowBox[{
+      "conformal", " ", "Killing", " ", "vector", " ", "on", " ",
+      RowBox[{"S", "^", "2"}]}], ";",
+     " ", "for", " ", "D", ">", "4"}], " ", ":",
+    " ", "Y^A", " ", "is", " ", "an", " ", "ordinary", " ", "Killing",
+    " ", "vector", " ", "of", " ", RowBox[{"S", "^", RowBox[{"(", "D-2", ")"}]}]}], " ", "*)"}],
+  "\[IndentingNewLine]",
+  RowBox[{
+   RowBox[{"DefTensor", "[",
+    RowBox[{
+     RowBox[{"YA", "[",
+      RowBox[{"+", "A"}], "]"}], ",", "S"}], "]"}], ";",
+   "\[IndentingNewLine]",
+   RowBox[{"(*", " ",
+    RowBox[{
+     "Killing", " ", "equation", " ", "on", " ",
+     RowBox[{"S", "^", RowBox[{"(", "D-2", ")"}]}]}], " ", "*)"}],
+   "\[IndentingNewLine]",
+   RowBox[{"killingEqnS", " ", "=", " ",
+    RowBox[{
+     RowBox[{"CDS", "[",
+      RowBox[{
+       RowBox[{"-", "A"}], ",",
+       RowBox[{"YA", "[",
+        RowBox[{"+", "B"}], "]"}]}], "]"}], " ", "+", " ",
+     RowBox[{"CDS", "[",
+      RowBox[{
+       RowBox[{"-", "B"}], ",",
+       RowBox[{"YA", "[",
+        RowBox[{"+", "A"}], "]"}]}], "]"}], " ", "\[Equal]", " ", "0"}]}]}]}]], "Input"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", " ",
+   RowBox[{
+    "Lie", " ", "bracket", " ", "of", " ", "two", " ", "supertranslations"}], " ", "*)"}],
+  "\[IndentingNewLine]",
+  RowBox[{
+   RowBox[{"DefTensor", "[",
+    RowBox[{
+     RowBox[{"fST1", "[","]"}], ",", "S"}], "]"}], ";",
+   "\[IndentingNewLine]",
+   RowBox[{"DefTensor", "[",
+    RowBox[{
+     RowBox[{"fST2", "[","]"}], ",", "S"}], "]"}], ";",
+   "\[IndentingNewLine]",
+   RowBox[{"(*", " ",
+    RowBox[{
+     RowBox[{"[", "\[Xi]_{f1}", ",", "\[Xi]_{f2}", "]"}], " ", "=", " ", "0",
+     " ", RowBox[{"(", "abelian", " ", "supertranslations", ")"}]}], " ", "*)"}],
+   "\[IndentingNewLine]",
+   RowBox[{"LieBracketST", " ", "=", " ",
+    RowBox[{
+     RowBox[{"LieD", "[",
+      RowBox[{
+       RowBox[{"\[Xi]ST", "[",
+        RowBox[{"\[Mu]"}], "]"}],
+       " ", "/.",
+       RowBox[{
+        RowBox[{"fST", "[","]"}], "\[Rule]",
+        RowBox[{"fST1", "[]"}]}]}], "]"}], "@",
+     RowBox[{"(", "\[Xi]STcomponents", " ", "/.",
+      RowBox[{
+       RowBox[{"fST", "[]"}], "\[Rule]",
+       RowBox[{"fST2", "[]"}]}], ")"}]}]}]}]}]], "Input"],
+
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["8. Conserved Charges via Wald-Zoupas Formalism", "Section"],
+
+Cell["\<\
+The conserved charges associated with the asymptotic symmetry generators are \
+computed using the covariant phase-space (Wald-Zoupas) formalism.
+
+  Q[f]  = \[Integral]_{\[ScriptCapitalI]^+}  f(x^A) M(u, x^A) d^{D-2}x \[Sqrt]{\[CapitalOmega]}  (Bondi mass)
+  J[Y]  = \[Integral]_{\[ScriptCapitalI]^+}  Y^A(x^B) N_A(u, x^B) d^{D-2}x \[Sqrt]{\[CapitalOmega]}  (Angular momentum)
+\>", "Text"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", " ",
+   RowBox[{
+    "Bondi", " ", "mass", " ", "charge", " ", "\[LongDash]",
+    " ", "symbolic", " ", "integrand"}], " ", "*)"}],
+  "\[IndentingNewLine]",
+  RowBox[{
+   RowBox[{"chargeM", " ", "=", " ",
+    RowBox[{
+     RowBox[{"fST", "[]"}], " ",
+     RowBox[{"MBondi", "[","]"}], " ",
+     RowBox[{"Sqrt", "[",
+      RowBox[{"Det", "[",
+       RowBox[{"Omega", "[",
+        RowBox[{"-", "A"}], ",",
+        RowBox[{"-", "B"}], "]"}], "]"}], "]"}]}]}], ";",
+   "\[IndentingNewLine]",
+   RowBox[{"(*", " ",
+    RowBox[{
+     "Angular", " ", "momentum", " ", "charge"}], " ", "*)"}],
+   "\[IndentingNewLine]",
+   RowBox[{"chargeJ", " ", "=", " ",
+    RowBox[{
+     RowBox[{"YA", "[",
+      RowBox[{"+", "A"}], "]"}], " ",
+     RowBox[{"NA", "[",
+      RowBox[{"-", "A"}], "]"}], " ",
+     RowBox[{"Sqrt", "[",
+      RowBox[{"Det", "[",
+       RowBox[{"Omega", "[",
+        RowBox[{"-", "A"}], ",",
+        RowBox[{"-", "B"}], "]"}], "]"}], "]"}]}]}], ";"}]}]], "Input"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", " ",
+   RowBox[{
+    "Charge", " ", "flux", " ", "through", " ",
+    RowBox[{"\[ScriptCapitalI]", "+"}]}], " ", "*)"}],
+  "\[IndentingNewLine]",
+  RowBox[{
+   RowBox[{"fluxM", " ", "=", " ",
+    RowBox[{"Integrate", "[",
+     RowBox[{
+      RowBox[{"massLossRHS", " ",
+       RowBox[{"fST", "[]"}], " ",
+       RowBox[{"Sqrt", "[",
+        RowBox[{"Det", "[",
+         RowBox[{"Omega", "[",
+          RowBox[{"-", "A"}], ",",
+          RowBox[{"-", "B"}], "]"}], "]"}], "]"}]}], ",",
+      RowBox[{"{",
+       RowBox[{"u", ",",
+        RowBox[{"-", "Infinity"}], ",", "Infinity"}], "}"}]}], "]"}]}], ";"}]}]], "Input"],
+
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["9. Component Calculation: 5-dimensional Example", "Section"],
+
+Cell["\<\
+As a concrete example, we set D = 5 and compute the leading-order Bondi \
+metric components and associated curvature in the Bondi\[Hyphen]Sachs gauge using \
+xCoba.\
+\>", "Text"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", " ",
+   RowBox[{
+    "Coordinates", " ", "for", " ", "D", "=", "5", " ", ":",
+    " ", "\[LeftBrace]u", ",", "r", ",", "\[Theta]1", ",",
+    "\[Theta]2", ",", "\[Phi]\[RightBrace]"}], " ", "*)"}],
+  "\[IndentingNewLine]",
+  RowBox[{
+   RowBox[{"coords5", " ", "=", " ",
+    RowBox[{"{",
+     RowBox[{"u", ",", "r", ",", "\[Theta]1", ",", "\[Theta]2", ",", "\[Phi]"}], "}"}]}], ";",
+   "\[IndentingNewLine]",
+   RowBox[{"(*", " ",
+    RowBox[{
+     "Unit", " ", "3\[Hyphen]sphere", " ", "metric", " ", ":",
+     " ",
+     RowBox[{"d\[CapitalOmega]", "^", "2"}], "=",
+     " ",
+     RowBox[{
+      RowBox[{"d\[Theta]1", "^", "2"}], "+",
+      RowBox[{
+       RowBox[{"Sin", "[", "\[Theta]1", "]"}], "^", "2"}],
+      RowBox[{"(",
+       RowBox[{
+        RowBox[{"d\[Theta]2", "^", "2"}], "+",
+        RowBox[{
+         RowBox[{"Sin", "[", "\[Theta]2", "]"}], "^", "2"}],
+         RowBox[{"d\[Phi]", "^", "2"}]}], ")"}]}]}]}], " ", "*)"}],
+   "\[IndentingNewLine]",
+   RowBox[{"OmegaS3", " ", "=", " ",
+    RowBox[{"DiagonalMatrix", "[",
+     RowBox[{"{",
+      RowBox[{"1", ",",
+       RowBox[{
+        RowBox[{"Sin", "[", "\[Theta]1", "]"}], "^", "2"}], ",",
+       RowBox[{
+        RowBox[{"Sin", "[", "\[Theta]1", "]"}], "^", "2"},
+        RowBox[{
+         RowBox[{"Sin", "[", "\[Theta]2", "]"}], "^", "2"}]}]}], "}"}],
+     "]"}]}]}]}]], "Input"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", " ",
+   RowBox[{
+    "Leading\[Hyphen]order", " ", "Bondi\[Hyphen]Sachs", " ",
+    "metric", " ", "in", " ", "D=5", " ", "\[LongDash]",
+    " ", "Minkowski", " ", "background"}], " ", "*)"}],
+  "\[IndentingNewLine]",
+  RowBox[{"(*", " ",
+   RowBox[{
+    "Row", "/", "column", " ", "ordering", " ", ":",
+    " ", "\[LeftBrace]u", ",", "r", ",", "\[Theta]1", ",",
+    "\[Theta]2", ",", "\[Phi]\[RightBrace]"}], " ", "*)"}],
+  "\[IndentingNewLine]",
+  RowBox[{
+   RowBox[{"gBondi5background", " ", "=", " ",
+    RowBox[{"{",
+     RowBox[{
+      RowBox[{"(*", " ",
+       RowBox[{"Row", " ", "u"}], " ", "*)"}],
+      RowBox[{"{",
+       RowBox[{
+        RowBox[{"-", "1"}], ",",
+        RowBox[{"-", "1"}], ",",
+        "0", ",", "0", ",", "0"}], "}"}], ",",
+      RowBox[{"(*", " ",
+       RowBox[{"Row", " ", "r"}], " ", "*)"}],
+      RowBox[{"{",
+       RowBox[{
+        RowBox[{"-", "1"}], ",", "0", ",",
+        "0", ",", "0", ",", "0"}], "}"}], ",",
+      RowBox[{"(*", " ",
+       RowBox[{"Row", " ", "\[Theta]1"}], " ", "*)"}],
+      RowBox[{"{",
+       RowBox[{"0", ",", "0", ",",
+        RowBox[{"r", "^", "2"}], ",", "0", ",", "0"}], "}"}], ",",
+      RowBox[{"(*", " ",
+       RowBox[{"Row", " ", "\[Theta]2"}], " ", "*)"}],
+      RowBox[{"{",
+       RowBox[{"0", ",", "0", ",", "0", ",",
+        RowBox[{
+         RowBox[{"r", "^", "2"}], " ",
+         RowBox[{"Sin", "[", "\[Theta]1", "]"}], "^", "2"}], ",",
+        "0"}], "}"}], ",",
+      RowBox[{"(*", " ",
+       RowBox[{"Row", " ", "\[Phi]"}], " ", "*)"}],
+      RowBox[{"{",
+       RowBox[{"0", ",", "0", ",", "0", ",", "0", ",",
+        RowBox[{
+         RowBox[{"r", "^", "2"}], " ",
+         RowBox[{"Sin", "[", "\[Theta]1", "]"}], "^", "2", " ",
+         RowBox[{"Sin", "[", "\[Theta]2", "]"}], "^", "2"}]}], "}"}]}],
+     "}"}]}], ";"}]}]], "Input"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", " ",
+   RowBox[{
+    "Full", " ", "Bondi", " ", "metric", " ", "with", " ", "perturbation",
+    " ", ":",
+    " ", "g", " ", "=", " ", "gBackground", " ", "+",
+    " ", "hPert"}], " ", "*)"}],
+  "\[IndentingNewLine]",
+  RowBox[{"(*", " ",
+   RowBox[{
+    "The", " ", "shear", " ", "tensor", " ", "C_{AB}", " ", "appears", " ",
+    "at", " ", "order", " ", "1", "/", "r", " ", "in", " ", "the", " ",
+    "transverse", " ", "block"}], " ", "*)"}],
+  "\[IndentingNewLine]",
+  RowBox[{
+   RowBox[{"DefTensor", "[",
+    RowBox[{
+     RowBox[{"Cab5", "[",
+      RowBox[{"i_", ",", "j_"}], "]"}], ",", "M",
+     RowBox[{"(*", " ",
+      RowBox[{"3x3", " ", "symmetric", " ", "traceless"}], " ", "*)"}]}], "]"}],
+    ";",
+   "\[IndentingNewLine]",
+   RowBox[{"hPertTransverse5", " ", "=", " ",
+    RowBox[{"r", " ",
+     RowBox[{"Table", "[",
+      RowBox[{
+       RowBox[{"Cab5", "[",
+        RowBox[{"i", ",", "j"}], "]"}], ",",
+       RowBox[{"{",
+        RowBox[{"i", ",", "3", ",", "5"}], "}"}], ",",
+       RowBox[{"{",
+        RowBox[{"j", ",", "3", ",", "5"}], "}"}]}], "]"}]}]}]}]}]], "Input"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", " ",
+   RowBox[{
+    "Christoffel", " ", "symbols", " ", "at", " ", "leading", " ",
+    "order"}], " ", "*)"}], "\[IndentingNewLine]",
+  RowBox[{
+   RowBox[{"ChristoffelBondi5", "[", "\[Rho]_", ",", "\[Mu]_", ",",
+    "\[Nu]_", "]"}], " ", ":=", " ",
+   RowBox[{"Simplify", "[",
+    RowBox[{
+     FractionBox["1", "2"],
+     RowBox[{"Sum", "[",
+      RowBox[{
+       RowBox[{
+        RowBox[{"Inverse", "[", "gBondi5background", "]"}],
+        RowBox[{"[",
+         RowBox[{"\[Rho]", ",", "\[Sigma]"}], "]"}], " ",
+        RowBox[{"(",
+         RowBox[{
+          RowBox[{"D", "[",
+           RowBox[{
+            RowBox[{"gBondi5background", "[",
+             RowBox[{"\[Mu]", ",", "\[Sigma]"}], "]"}], ",",
+            RowBox[{"coords5", "[",
+             RowBox[{"[", "\[Nu]", "]"}], "]"}]}], "]"}], " ", "+",
+          " ",
+          RowBox[{"D", "[",
+           RowBox[{
+            RowBox[{"gBondi5background", "[",
+             RowBox[{"\[Nu]", ",", "\[Sigma]"}], "]"}], ",",
+            RowBox[{"coords5", "[",
+             RowBox[{"[", "\[Mu]", "]"}], "]"}]}], "]"}], " ", "-", " ",
+          RowBox[{"D", "[",
+           RowBox[{
+            RowBox[{"gBondi5background", "[",
+             RowBox[{"\[Mu]", ",", "\[Nu]"}], "]"}], ",",
+            RowBox[{"coords5", "[",
+             RowBox[{"[", "\[Sigma]", "]"}], "]"}]}], "]"}]}], ")"}]}], ",",
+       RowBox[{"{",
+        RowBox[{"\[Sigma]", ",", "1", ",", "5"}], "}"}]}], "]"}]}], "]"}]}]}]], "Input"],
+
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["10. Soft Theorems and Memory Effect", "Section"],
+
+Cell["\<\
+In D = 4, Weinberg's soft graviton theorem is equivalent to the BMS Ward \
+identity and to the leading gravitational memory effect.  In D > 4 the soft \
+theorem is modified due to the different falloff rates and the reduced \
+asymptotic symmetry group.
+
+Key results for D > 4:
+  \[Bullet] No logarithmic soft factor (absent subleading BMS symmetry in D > 4)
+  \[Bullet] Memory effect suppressed by r^{-(D-4)/2} relative to D = 4
+  \[Bullet] Displacement memory still present but its form changes\
+\>", "Text"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", " ",
+   RowBox[{
+    "Gravitational", " ", "memory", " ", "tensor", " ", "in", " ", "D",
+    " ", "dimensions"}], " ", "*)"}],
+  "\[IndentingNewLine]",
+  RowBox[{
+   RowBox[{"DefTensor", "[",
+    RowBox[{
+     RowBox[{"memoryAB", "[",
+      RowBox[{"-", "A"}], ",",
+      RowBox[{"-", "B"}], "]"}], ",",
+     RowBox[{"{",
+      RowBox[{"S", ",", "M"}], "}"}], ",",
+     RowBox[{"Symmetric", "[",
+      RowBox[{"{",
+       RowBox[{"1", ",", "2"}], "}"}], "]"}]}], "]"}], ";",
+   "\[IndentingNewLine]",
+   RowBox[{"(*", " ",
+    RowBox[{
+     "Memory", " ", "formula", " ", ":",
+     " ", "\[CapitalDelta]C_{AB}", " ", "=",
+     " ", "\[Integral]_{-\[Infinity]}^{\[Infinity]} N_{AB} du"}], " ", "*)"}],
+   "\[IndentingNewLine]",
+   RowBox[{"memoryRule", " ", "=", " ",
+    RowBox[{
+     RowBox[{"memoryAB", "[",
+      RowBox[{"-", "A"}], ",",
+      RowBox[{"-", "B"}], "]"}], " ", "\[Rule]",
+     " ",
+     RowBox[{"Integrate", "[",
+      RowBox[{
+       RowBox[{"NAB", "[",
+        RowBox[{"-", "A"}], ",",
+        RowBox[{"-", "B"}], "]"}], ",",
+       RowBox[{"{",
+        RowBox[{"u", ",",
+         RowBox[{"-", "Infinity"}], ",", "Infinity"}], "}"}]}], "]"}]}]}], ";",
+   "\[IndentingNewLine]",
+   RowBox[{"(*", " ",
+    RowBox[{
+     "Scalar", " ", "memory", " ", "measure", " ", ":",
+     " ", "geodesic", " ", "deviation", " ", "of", " ", "test", " ",
+     "particles"}], " ", "*)"}],
+   "\[IndentingNewLine]",
+   RowBox[{"memoryScalar", " ", "=", " ",
+    RowBox[{"ContractMetric", "[",
+     RowBox[{
+      RowBox[{"Omega", "[",
+       RowBox[{"A", ",", "C"}], "]"}],
+      RowBox[{"Omega", "[",
+       RowBox[{"B", ",", "E"}], "]"}],
+      RowBox[{"memoryAB", "[",
+       RowBox[{"-", "A"}], ",",
+       RowBox[{"-", "B"}], "]"}],
+      RowBox[{"memoryAB", "[",
+       RowBox[{"-", "C"}], ",",
+       RowBox[{"-", "E"}], "]"}]}], "]"}]}], ";"}]}]], "Input"],
+
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["11. Perturbative Expansion with xPert", "Section"],
+
+Cell["\<\
+We use xPert to perform systematic 1/r perturbation theory around the flat \
+Minkowski background.  The parameter \[Epsilon] is treated as the formal \
+expansion parameter.\
+\>", "Text"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", " ",
+   RowBox[{
+    "Define", " ", "perturbation", " ", "parameter", " ", "\[Epsilon]"}], " ", "*)"}],
+  "\[IndentingNewLine]",
+  RowBox[{
+   RowBox[{"DefParameter", "[", "\[Epsilon]", "]"}], ";",
+   "\[IndentingNewLine]",
+   RowBox[{"(*", " ",
+    RowBox[{
+     "Background", " ", "metric", " ", ":",
+     " ", "flat", " ", "Minkowski"}], " ", "*)"}],
+   "\[IndentingNewLine]",
+   RowBox[{"DefTensor", "[",
+    RowBox[{
+     RowBox[{"etaMetric", "[",
+      RowBox[{"-", "\[Mu]"}], ",",
+      RowBox[{"-", "\[Nu]"}], "]"}], ",", "M", ",",
+     RowBox[{"Symmetric", "[",
+      RowBox[{"{",
+       RowBox[{"1", ",", "2"}], "}"}], "]"}]}], "]"}], ";",
+   "\[IndentingNewLine]",
+   RowBox[{"(*", " ",
+    RowBox[{
+     "First", " ", "order", " ", "perturbation", " ", ":",
+     " ", "h_{\\mu\\nu}"}], " ", "*)"}],
+   "\[IndentingNewLine]",
+   RowBox[{"DefTensor", "[",
+    RowBox[{
+     RowBox[{"hPert", "[",
+      RowBox[{"-", "\[Mu]"}], ",",
+      RowBox[{"-", "\[Nu]"}], "]"}], ",", "M", ",",
+     RowBox[{"Symmetric", "[",
+      RowBox[{"{",
+       RowBox[{"1", ",", "2"}], "}"}], "]"}]}], "]"}], ";",
+   "\[IndentingNewLine]",
+   RowBox[{"(*", " ",
+    RowBox[{
+     "Perturbation", " ", "of", " ", "Ricci", " ", "tensor", " ",
+     "to", " ", "first", " ", "order"}], " ", "*)"}],
+   "\[IndentingNewLine]",
+   RowBox[{"pertRicci", " ", "=", " ",
+    RowBox[{"Perturbation", "[",
+     RowBox[{
+      RowBox[{"RicciCD", " ", "/.",
+       RowBox[{"\[Mu]", "\[Rule]", "\[Mu]"}]}], ",", "1"}], "]"}]}], ";",
+   "\[IndentingNewLine]",
+   RowBox[{"linearisedEin", " ", "=", " ",
+    RowBox[{"Perturbation", "[",
+     RowBox[{
+      RowBox[{"EinsteinCD", " ", "/.",
+       RowBox[{"\[Mu]", "\[Rule]", "\[Mu]"}]}], ",", "1"}], "]"}]}], ";"}]}]], "Input"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", " ",
+   RowBox[{
+    "Linearised", " ", "Einstein", " ", "equations", " ", "in", " ",
+    "Bondi", " ", "gauge"}], " ", "*)"}],
+  "\[IndentingNewLine]",
+  RowBox[{"(*", " ",
+   RowBox[{
+    "The", " ", "gauge", " ", "condition", " ", ":",
+    " ", "transverse\[Hyphen]traceless", " ", "gauge",
+    " ", RowBox[{"(",
+     RowBox[{"\[PartialD]^\[Mu]", " ", "h_{\[Mu]\[Nu]}", " ", "=",
+      " ", "0", ",",
+      " ", RowBox[{"h", "^\\mu_\\mu", " ", "=", " ", "0"}]}], ")"}]}], " ", "*)"}],
+  "\[IndentingNewLine]",
+  RowBox[{
+   RowBox[{"ttGauge", " ", "=", " ",
+    RowBox[{"{",
+     RowBox[{
+      RowBox[{
+       RowBox[{"CD", "[",
+        RowBox[{"\[Mu]", ",",
+         RowBox[{"hPert", "[",
+          RowBox[{
+           RowBox[{"-", "\[Mu]"}], ",",
+           RowBox[{"-", "\[Nu]"}]}], "]"}]}], "]"}], " ", "\[Rule]", " ", "0"}], ",",
+      RowBox[{
+       RowBox[{"gMetric", "[",
+        RowBox[{"\[Mu]", ",", "\[Nu]"}], "]"}],
+       RowBox[{"hPert", "[",
+        RowBox[{
+         RowBox[{"-", "\[Mu]"}], ",",
+         RowBox[{"-", "\[Nu]"}]}], "]"}], " ", "\[Rule]", " ", "0"}]}], "}"}]}], ";"}]}]], "Input"],
+
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["12. Summary and Future Work", "Section"],
+
+Cell["\<\
+This notebook provides version 1 of the xAct-based analysis of higher \
+dimensional asymptotically flat spacetimes.  The main results coded here are:
+
+  1. Definition of the D-dimensional manifold, metric, and Bondi-Sachs \
+coordinates.
+  2. Asymptotic falloff conditions for the metric components in D \[GreaterEqual] 4.
+  3. Symbolic computation of Riemann, Ricci and Einstein tensors via xTensor.
+  4. Bondi mass-loss and angular momentum-loss equations.
+  5. Generalised BMS asymptotic symmetry algebra.
+  6. Conserved charge expressions.
+  7. Gravitational memory tensor and memory formula.
+  8. xPert linearised perturbation theory setup.
+  9. Concrete 5-dimensional example with Bondi metric components.
+
+Planned work (v2):
+  \[Bullet] Full 1/r expansion to subleading order for all metric functions.
+  \[Bullet] Explicit computation of the Bondi mass-loss formula including \
+angular momentum flux.
+  \[Bullet] Relation to soft theorems in D > 4 (absence of soft divergences).
+  \[Bullet] Extension to odd-dimensional spacetimes (half-integer falloffs).
+  \[Bullet] Numerical verification of the analytic expressions.\
+\>", "Text"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", " ",
+   RowBox[{"References"}], " ", "*)"}],
+  "\[IndentingNewLine]",
+  RowBox[{"(*",
+   RowBox[{
+    "\[Bullet]", " ",
+    RowBox[{
+     "Bondi", ",", " ", "van", " ", "der", " ", "Burg", ",", " ",
+     "Metzner", " ",
+     RowBox[{"(", "1962", ")"}], " ", "Proc.", " ", "R.", " ", "Soc.", " ",
+     "London"}]}], " ", "*)"}], "\[IndentingNewLine]",
+  RowBox[{"(*",
+   RowBox[{
+    "\[Bullet]", " ",
+    RowBox[{
+     "Sachs", " ",
+     RowBox[{"(", "1962", ")"}], " ", "Phys.", " ", "Rev."}]}], " ", "*)"}],
+  "\[IndentingNewLine]",
+  RowBox[{"(*",
+   RowBox[{
+    "\[Bullet]", " ",
+    RowBox[{
+     "Hollands", ",", " ", "Ishibashi", " ",
+     RowBox[{"(", "2005", ")"}],
+     " ", "Commun.", " ", "Math.", " ", "Phys."}]}], " ", "*)"}],
+  "\[IndentingNewLine]",
+  RowBox[{"(*",
+   RowBox[{
+    "\[Bullet]", " ",
+    RowBox[{
+     "Kapec", ",", " ", "Raclariu", ",", " ", "Strominger", " ",
+     RowBox[{"(", "2015", ")"}], " ", "arXiv:1507.04352"}]}], " ", "*)"}],
+  "\[IndentingNewLine]",
+  RowBox[{"(*",
+   RowBox[{
+    "\[Bullet]", " ",
+    RowBox[{
+     "Campiglia", ",", " ", "Laddha", " ",
+     RowBox[{"(", "2020", ")"}], " ", "arXiv:2011.01908"}]}], " ", "*)"}],
+  "\[IndentingNewLine]",
+  RowBox[{"(*",
+   RowBox[{
+    "\[Bullet]", " ",
+    RowBox[{
+     "xAct", " ", "framework", " ", ":", " ",
+     "http://www.xact.es/"}]}], " ", "*)"}]}]], "Input"],
+
+}, Open  ]]
+
+}, Open  ]]
+
+},
+WindowSize -> {1200, 800},
+WindowMargins -> {{Automatic, Automatic}, {Automatic, Automatic}},
+PrintingCopies -> 1,
+PrintingPageRange -> {1, Automatic},
+FrontEndVersion -> "13.3 for Mac OS X x86 (64-bit) (July 24, 2023)",
+StyleDefinitions -> "Default.nb",
+ExpressionUUID -> "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+]
